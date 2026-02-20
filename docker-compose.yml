@@ -1,0 +1,96 @@
+version: '3.8'
+
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    container_name: blueberry-mqtt
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - mosquitto-data:/mosquitto/data
+      - mosquitto-logs:/mosquitto/log
+    networks:
+      - blueberry-net
+
+  aud_pro:
+    build:
+      context: ./AUD_PRO
+      dockerfile: Dockerfile
+    container_name: blueberry-pro
+    restart: unless-stopped
+    depends_on:
+      - mosquitto
+    ports:
+      - "5005:5005"
+      - "5055:5055"
+      - "8000:8000"
+    volumes:
+      - ./AUD_PRO/models:/app/models:ro
+      - ./AUD_PRO/database:/app/database
+      - aud-pro-logs:/app/logs
+    environment:
+      - MQTT_BROKER=mosquitto
+      - MQTT_PORT=1883
+      - TF_ENABLE_ONEDNN_OPTS=1
+    networks:
+      - blueberry-net
+    devices:
+      - /dev/snd:/dev/snd  # Audio device access (if needed)
+
+  aud_cap:
+    build:
+      context: ./AUD_CAP
+      dockerfile: Dockerfile
+    container_name: blueberry-cap
+    restart: unless-stopped
+    depends_on:
+      - mosquitto
+      - aud_pro
+    volumes:
+      - aud-cap-logs:/app/logs
+    environment:
+      - MQTT_BROKER=mosquitto
+      - MQTT_PORT=1883
+    networks:
+      - blueberry-net
+    devices:
+      - /dev/snd:/dev/snd  # Microphone access
+    group_add:
+      - audio
+    privileged: true  # Required for audio device access
+
+  aud_ret:
+    build:
+      context: ./AUD_RET
+      dockerfile: Dockerfile
+    container_name: blueberry-ret
+    restart: unless-stopped
+    depends_on:
+      - mosquitto
+    volumes:
+      - aud-ret-logs:/app/logs
+      - aud-ret-cache:/app/tts_cache
+    environment:
+      - MQTT_BROKER=mosquitto
+      - MQTT_PORT=1883
+    networks:
+      - blueberry-net
+    devices:
+      - /dev/snd:/dev/snd  # Speaker access
+    group_add:
+      - audio
+
+networks:
+  blueberry-net:
+    driver: bridge
+
+volumes:
+  mosquitto-data:
+  mosquitto-logs:
+  aud-pro-logs:
+  aud-cap-logs:
+  aud-ret-logs:
+  aud-ret-cache:
