@@ -449,6 +449,377 @@ ping 127.0.0.1  # Should be <1ms
 
 ---
 
+## 🐳 Docker Deployment (Recommended for Raspberry Pi)
+
+Blueberry provides pre-built Docker images for easy deployment on Raspberry Pi. This is the **recommended deployment method** for production use.
+
+### Why Docker?
+
+- ✅ **One-command deployment** - No dependency management
+- ✅ **Isolated environments** - Each service runs independently
+- ✅ **Easy updates** - Pull latest images and restart
+- ✅ **Reproducible builds** - Same environment everywhere
+- ✅ **Auto-restart** - Services recover from crashes automatically
+
+---
+
+### Prerequisites
+
+**Hardware:**
+- Raspberry Pi 4/5 (4GB+ RAM)
+- USB Microphone + Speaker
+- MicroSD card with 32GB+ space
+
+**Software:**
+```bash
+# Install Docker and Docker Compose on Raspberry Pi
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+sudo usermod -aG docker $USER
+sudo pip3 install docker-compose
+
+# Reboot to apply group changes
+sudo reboot
+```
+
+---
+
+### Quick Start (Using Pre-built Images)
+
+If images are available on Docker Hub:
+
+```bash
+# 1. Clone repository
+git clone https://github.com/yourusername/blueberry.git
+cd blueberry
+
+# 2. Pull pre-built ARM64 images
+docker-compose pull
+
+# 3. Start all services
+docker-compose up -d
+
+# 4. Check status
+docker-compose ps
+
+# Services should show as "Up"
+```
+
+**That's it!** Say "Blueberry" to activate.
+
+---
+
+### Building Images Locally
+
+To build images on your Raspberry Pi (takes ~15-20 minutes):
+
+```bash
+# 1. Clone repository
+git clone https://github.com/yourusername/blueberry.git
+cd blueberry
+
+# 2. Train Rasa model first (one-time, ~10 minutes)
+cd AUD_PRO
+rasa train
+cd ..
+
+# 3. Build all Docker images
+docker-compose build
+
+# 4. Start services
+docker-compose up -d
+```
+
+---
+
+### Container Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                  Docker Compose Stack                    │
+└─────────────────────────────────────────────────────────┘
+
+  ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+  │ blueberry-cap│     │ blueberry-pro│     │ blueberry-ret│
+  │  AUD_CAP     │────▶│   AUD_PRO    │────▶│   AUD_RET    │
+  │              │     │              │     │              │
+  │ Wake + VAD   │     │ Rasa + NLU   │     │  TTS + Play  │
+  │ Port: -      │     │ Port: 5005   │     │  Port: -     │
+  └──────────────┘     └──────────────┘     └──────────────┘
+         │                     │                      │
+         └─────────────────────┴──────────────────────┘
+                              │
+                    ┌─────────▼──────────┐
+                    │  mosquitto (MQTT)  │
+                    │   Port: 1883       │
+                    └────────────────────┘
+```
+
+---
+
+### Managing Services
+
+**View Logs:**
+```bash
+# All services
+docker-compose logs -f
+
+# Specific service
+docker-compose logs -f aud_cap    # Audio capture
+docker-compose logs -f aud_pro    # Processing
+docker-compose logs -f aud_ret    # Audio output
+docker-compose logs -f mosquitto  # MQTT broker
+
+# Last 100 lines
+docker-compose logs --tail=100 aud_cap
+```
+
+**Check Status:**
+```bash
+# Service status
+docker-compose ps
+
+# Resource usage
+docker stats
+```
+
+**Restart Services:**
+```bash
+# Restart all
+docker-compose restart
+
+# Restart specific service
+docker-compose restart aud_cap
+docker-compose restart aud_pro
+docker-compose restart aud_ret
+```
+
+**Stop Services:**
+```bash
+# Stop all (containers preserved)
+docker-compose stop
+
+# Stop and remove containers
+docker-compose down
+
+# Stop and remove everything (including volumes)
+docker-compose down -v
+```
+
+---
+
+### Updating Blueberry
+
+**Method 1: Pull Latest Images (if using Docker Hub)**
+```bash
+cd blueberry
+docker-compose pull        # Pull latest images
+docker-compose down        # Stop current containers
+docker-compose up -d       # Start with new images
+```
+
+**Method 2: Rebuild Locally**
+```bash
+cd blueberry
+git pull origin main       # Get latest code
+docker-compose build       # Rebuild images
+docker-compose down
+docker-compose up -d
+```
+
+---
+
+### Persistent Data
+
+Docker volumes preserve data across restarts:
+
+- **Database** - `/app/database` in `aud_pro` container
+- **Logs** - `/app/logs` in all containers
+- **TTS Cache** - `/app/tts_cache` in `aud_ret` container
+- **MQTT Data** - `/mosquitto/data` in `mosquitto` container
+
+**Backup data:**
+```bash
+# Backup database
+docker cp blueberry-pro:/app/database/assistant_data.db ./backup/
+
+# Backup all logs
+docker-compose logs > logs_backup.txt
+```
+
+---
+
+### Troubleshooting Docker Deployment
+
+**Issue: Containers won't start**
+```bash
+# Check Docker service
+sudo systemctl status docker
+
+# View detailed logs
+docker-compose logs
+
+# Check resource usage
+free -h  # Should have 1GB+ available
+df -h    # Should have 5GB+ free space
+```
+
+**Issue: Audio not working**
+```bash
+# Verify audio devices
+aplay -l   # List playback devices
+arecord -l # List capture devices
+
+# Check device permissions
+ls -l /dev/snd/
+# Should show devices accessible by docker group
+
+# Test speaker
+docker-compose exec aud_ret speaker-test -t wav -c 2
+
+# Test microphone
+docker-compose exec aud_cap arecord -d 5 test.wav
+```
+
+**Issue: MQTT connection failed**
+```bash
+# Check Mosquitto is running
+docker-compose logs mosquitto
+
+# Test MQTT connectivity
+docker-compose exec aud_cap ping mosquitto
+
+# Check MQTT port
+netstat -an | grep 1883
+```
+
+**Issue: Rasa model not found**
+```bash
+# Check if model exists
+docker-compose exec aud_pro ls -la models/
+
+# Train new model
+cd AUD_PRO
+rasa train
+docker-compose build aud_pro  # Rebuild with new model
+docker-compose up -d
+```
+
+**Issue: High CPU usage**
+```bash
+# Check which service is causing load
+docker stats
+
+# View process list in container
+docker-compose exec aud_pro top
+
+# Restart problematic service
+docker-compose restart aud_pro
+```
+
+---
+
+### Advanced Configuration
+
+**Custom Docker Compose Override:**
+
+Create `docker-compose.override.yml` for custom settings:
+
+```yaml
+version: '3.8'
+
+services:
+  aud_pro:
+    environment:
+      - RASA_TELEMETRY_ENABLED=false
+      - LOG_LEVEL=DEBUG
+    
+  aud_cap:
+    environment:
+      - WAKE_WORD_SENSITIVITY=0.5
+      - VAD_AGGRESSIVENESS=3
+```
+
+**Resource Limits:**
+
+Add to `docker-compose.yml`:
+
+```yaml
+services:
+  aud_pro:
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '2.0'
+        reservations:
+          memory: 1G
+```
+
+**Multi-Architecture Build:**
+
+Build for both ARM64 and AMD64:
+
+```bash
+# Enable buildx
+docker buildx create --use
+
+# Build for multiple platforms
+docker buildx build --platform linux/arm64,linux/amd64 \
+  -t yourusername/blueberry-cap:latest \
+  --push \
+  ./AUD_CAP
+```
+
+---
+
+### Production Deployment Checklist
+
+- [ ] Docker and Docker Compose installed
+- [ ] Audio devices working (`aplay -l` and `arecord -l`)
+- [ ] Sufficient resources (4GB+ RAM, 10GB+ disk)
+- [ ] Rasa model trained (`AUD_PRO/models/*.tar.gz` exists)
+- [ ] `docker-compose.yml` configured correctly
+- [ ] MQTT broker accessible (`mosquitto.conf` present)
+- [ ] Containers start successfully (`docker-compose ps`)
+- [ ] Logs show no errors (`docker-compose logs`)
+- [ ] Wake word detection working (say "Blueberry")
+- [ ] Audio output working (response heard through speaker)
+
+---
+
+### Docker vs Native Installation
+
+| Feature | Docker | Native Install |
+|---------|--------|----------------|
+| **Setup Time** | 5 minutes | 30+ minutes |
+| **Dependencies** | Automatic | Manual |
+| **Updates** | One command | Multi-step |
+| **Isolation** | Complete | None |
+| **Debugging** | Container logs | System logs |
+| **Resource Usage** | +200MB overhead | Minimal |
+| **Recommended For** | Production | Development |
+
+
+**Recommendation:** Use Docker for Raspberry Pi deployment, native install for development.
+
+---
+
+### Getting Help
+
+**Docker-specific issues:**
+- Check container logs: `docker-compose logs -f`
+- Inspect container: `docker-compose exec aud_cap bash`
+- View resource usage: `docker stats`
+
+**Report issues:** [GitHub Issues](https://github.com/yourusername/blueberry/issues)  
+**Docker documentation:** [Docker Docs](https://docs.docker.com/)
+
+---
+
+
+---
+
 ## 📊 Performance Benchmarks
 
 ### Latency Comparison
