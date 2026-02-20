@@ -1,6 +1,6 @@
 FROM arm64v8/python:3.9-slim-bullseye
 
-LABEL maintainer="your.email@example.com"
+LABEL maintainer="vedant.240102162@iiitbh.ac.in"
 LABEL description="Blueberry Audio Output - TTS synthesis and playback"
 
 # Install system dependencies for audio playback
@@ -43,4 +43,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
     CMD python -c "import paho.mqtt.client as mqtt; print('OK')" || exit 1
 
 # Start the application
-CMD ["python", "-u", "output.py"]
+CMD ["py", "-u", "output.py"]

@@ -140,7 +140,7 @@ Bot:  "किचन और बेडरूम की लाइट बंद क�
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/yourusername/blueberry.git
+git clone https://github.com/VedMakes/Blueberry-offline-voice-asst.
 cd blueberry
 
 # 2. Install dependencies
@@ -490,7 +490,7 @@ If images are available on Docker Hub:
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/yourusername/blueberry.git
+git clone https://github.com/VedMakes/Blueberry-offline-voice-asst.
 cd blueberry
 
 # 2. Pull pre-built ARM64 images
@@ -515,7 +515,7 @@ To build images on your Raspberry Pi (takes ~15-20 minutes):
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/yourusername/blueberry.git
+git clone https://github.com/VedMakes/Blueberry-offline-voice-asst.
 cd blueberry
 
 # 2. Train Rasa model first (one-time, ~10 minutes)
@@ -812,7 +812,7 @@ docker buildx build --platform linux/arm64,linux/amd64 \
 - Inspect container: `docker-compose exec aud_cap bash`
 - View resource usage: `docker stats`
 
-**Report issues:** [GitHub Issues](https://github.com/yourusername/blueberry/issues)  
+**Report issues:** [GitHub Issues](https://github.com/VedMakes/Blueberry-offline-voice-asst./issues)  
 **Docker documentation:** [Docker Docs](https://docs.docker.com/)
 
 ---
@@ -920,7 +920,7 @@ Contributions are welcome! Whether it's bug fixes, new features, documentation i
 
 ```bash
 # Fork and clone
-git clone https://github.com/yourusername/blueberry.git
+git clone https://github.com/VedMakes/Blueberry-offline-voice-asst.
 cd blueberry
 
 # Create virtual environment

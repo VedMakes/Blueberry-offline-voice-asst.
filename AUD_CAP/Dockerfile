@@ -1,6 +1,6 @@
 FROM arm64v8/python:3.9-slim-bullseye
 
-LABEL maintainer="your.email@example.com"
+LABEL maintainer="vedant.240102162@iiitbh.ac.in"
 LABEL description="Blueberry Audio Capture - Wake word detection and ASR"
 
 # Install system dependencies
