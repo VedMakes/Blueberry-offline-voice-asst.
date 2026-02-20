@@ -536,16 +536,6 @@ tail -f AUD_RET/logs/audio_output.log
 
 ## 📖 Documentation
 
-### Additional Resources
-
-- **[Installation Guide](docs/INSTALL.md)** - Detailed setup instructions
-- **[Architecture Deep Dive](docs/ARCHITECTURE.md)** - System design details
-- **[API Reference](docs/API.md)** - MQTT topics, action server endpoints
-- **[Contributing Guide](CONTRIBUTING.md)** - Development workflow
-- **[Changelog](CHANGELOG.md)** - Version history
-
-### Research Paper
-
 This project is documented in an academic report available in this repository:
 - **[Project Report](docs/Blueberry_Voice_Assistant_Report.docx)** - Comprehensive technical documentation including methodology, challenges, and performance analysis
 
