@@ -1,0 +1,381 @@
+version: "3.1"
+
+intents:
+  # ==================== DEVICE CONTROL ====================
+  - turn_on_light
+  - turn_off_light
+  - set_brightness
+  - turn_on_fan
+  - turn_off_fan
+  - set_fan_speed
+  - turn_on_ac
+  - turn_off_ac
+  - set_temperature
+  
+  # ==================== TIME & SCHEDULING ====================
+  - set_alarm
+  - cancel_alarm
+  - list_alarms
+  - set_reminder
+  - cancel_reminder
+  - list_reminders
+  - set_timer
+  - cancel_timer
+  - check_timer
+  
+  # ==================== LISTS & NOTES ====================
+  - add_to_shopping_list
+  - remove_from_shopping_list
+  - read_shopping_list
+  - clear_shopping_list
+  - add_to_todo_list
+  - remove_from_todo_list
+  - read_todo_list
+  - mark_todo_complete
+  - create_note
+  - read_notes
+  
+  # ==================== CALENDAR & EVENTS ====================
+  - add_calendar_event
+  - check_calendar
+  - delete_calendar_event
+  - what_is_today
+  - what_is_tomorrow
+  
+  # ==================== MEMORY MANAGEMENT ====================
+  - remember_this
+  - forget_this
+  - set_preference
+  - recall_memory
+  - search_memory
+  
+  # ==================== INFORMATION QUERIES ====================
+  - ask_time
+  - ask_date
+  - ask_weather
+  - ask_status
+  - ask_news
+  
+  # ==================== CONVERSATION ====================
+  - greet
+  - goodbye
+  - thank
+  - affirm
+  - deny
+  - help
+  - repeat
+
+entities:
+  # Location
+  - room
+  
+  # Devices
+  - device
+  
+  # Device parameters
+  - brightness
+  - speed
+  - temperature
+  - color
+  
+  # Time-related
+  - time
+  - name
+  - duration
+ 
+  # List items
+  - item
+  - list_type
+  
+  # Calendar
+  - event_name
+  - event_location
+  
+  # Memory-related
+  - preference_type
+  - memory_content
+  - note_content
+  
+  # General
+  - number
+  - person
+
+slots:
+  # ========== Device Control Slots ==========
+  room:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_entity
+        entity: room
+  
+  device:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_entity
+        entity: device
+  
+  brightness:
+    type: float
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: brightness
+  
+  speed:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: speed
+  
+  temperature:
+    type: float
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: temperature
+  
+  # ========== Time & Scheduling Slots ==========
+  alarm_time:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: time
+      
+  alarm_name:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: name
+  
+  reminder_time:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: time
+  
+  reminder_text:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: memory_content
+  
+  timer_duration:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: duration
+  
+  # ========== List Slots ==========
+  shopping_item:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: item
+  
+  todo_item:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: item
+  
+  note_content:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: note_content
+  
+  # ========== Calendar Slots ==========
+  event_name:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: event_name
+  
+  event_date:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: date
+  
+  event_time:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: time
+  
+  event_location:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: event_location
+  
+  # ========== Context Slots ==========
+  last_intent:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: custom
+  
+  context_device:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: custom
+  
+  context_item:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: custom
+
+responses:
+  # ========== Greetings & Conversation ==========
+  utter_greet:
+    - text: "नमस्ते! मैं आपकी कैसे मदद कर सकता हूं?"
+    - text: "हाय! क्या चाहिए?"
+    - text: "हेलो! बोलिए।"
+  
+  utter_goodbye:
+    - text: "अच्छा, फिर मिलेंगे!"
+    - text: "ठीक है, बाय!"
+    - text: "धन्यवाद, अलविदा!"
+  
+  utter_thanks_response:
+    - text: "कोई बात नहीं!"
+    - text: "स्वागत है!"
+    - text: "खुशी हुई मदद करके!"
+  
+  utter_help:
+    - text: "मैं आपकी मदद कर सकता हूं:\n- लाइट, पंखा, एसी चालू/बंद करने में\n- अलार्म और रिमाइंडर सेट करने में\n- शॉपिंग लिस्ट बनाने में\n- समय, मौसम बताने में"
+  
+  # ========== Errors & Fallbacks ==========
+  utter_default:
+    - text: "माफ करें, मैं समझ नहीं पाया। क्या आप फिर से बोल सकते हैं?"
+    - text: "मुझे यह समझ नहीं आया।"
+  
+  utter_ask_rephrase:
+    - text: "क्या आप इसे दूसरे तरीके से बोल सकते हैं?"
+  
+  # ========== Alarms & Reminders ==========
+  utter_alarm_set:
+    - text: "अलार्म {alarm_time} बजे के लिए सेट कर दिया।"
+    - text: "ठीक है, {alarm_time} पर अलार्म लग जाएगा।"
+  
+  utter_alarm_cancelled:
+    - text: "अलार्म रद्द कर दिया।"
+    - text: "ठीक है, अलार्म हटा दिया।"
+  
+  utter_no_alarms:
+    - text: "कोई अलार्म सेट नहीं है।"
+  
+  utter_reminder_set:
+    - text: "रिमाइंडर सेट कर दिया।"
+    - text: "ठीक है, याद दिला दूंगा।"
+  
+  utter_timer_set:
+    - text: "{timer_duration} का टाइमर शुरू कर दिया।"
+  
+  # ========== Lists ==========
+  utter_item_added:
+    - text: "{item} लिस्ट में डाल दिया।"
+    - text: "ठीक है, {item} जोड़ दिया।"
+  
+  utter_item_removed:
+    - text: "{item} लिस्ट से हटा दिया।"
+  
+  utter_list_empty:
+    - text: "लिस्ट खाली है।"
+  
+  # ========== Device Control ==========
+  utter_device_on:
+    - text: "{room} की {device} चालू कर दी।"
+    - text: "हो गया, {device} चालू है।"
+  
+  utter_device_off:
+    - text: "{room} की {device} बंद कर दी।"
+    - text: "ठीक है, {device} बंद है।"
+  
+  utter_brightness_set:
+    - text: "{device} {brightness}% पर सेट कर दी।"
+  
+  # ========== Memory ==========
+  utter_remembered:
+    - text: "ठीक है, याद रखा।"
+    - text: "मैंने याद कर लिया।"
+  
+  utter_forgotten:
+    - text: "ठीक है, भूल गया।"
+  
+  utter_note_saved:
+    - text: "नोट सेव कर दिया।"
+
+actions:
+  # Device control
+  - action_turn_on_device
+  - action_turn_off_device
+  - action_set_brightness
+  - action_set_fan_speed
+  - action_set_temperature
+  
+  # Time & scheduling
+  - action_set_alarm
+  - action_cancel_alarm
+  - action_list_alarms
+  - action_set_reminder
+  - action_cancel_reminder
+  - action_list_reminders
+  - action_set_timer
+  - action_cancel_timer
+  - action_check_timer
+  
+  # Lists
+  - action_add_to_shopping_list
+  - action_remove_from_shopping_list
+  - action_read_shopping_list
+  - action_clear_shopping_list
+  - action_add_to_todo
+  - action_mark_todo_complete
+  - action_read_todo_list
+  
+  # Calendar
+  - action_add_calendar_event
+  - action_check_calendar
+  - action_delete_calendar_event
+  
+  # Memory
+  - action_remember_preference
+  - action_recall_memory
+  - action_forget_memory
+  - action_create_note
+  - action_read_notes
+  - action_search_memory
+  
+  # Information
+  - action_get_time
+  - action_get_date
+  - action_get_weather
+  - action_get_status
+  - action_get_news
+  
+  # Utility
+  - action_default_fallback
+  - action_repeat_last
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true

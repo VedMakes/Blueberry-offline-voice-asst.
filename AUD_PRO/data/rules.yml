@@ -1,0 +1,202 @@
+version: "3.1"
+
+rules:
+  # ========== CONVERSATION ==========
+  - rule: Say goodbye anytime user says goodbye
+    steps:
+      - intent: goodbye
+      - action: utter_goodbye
+
+  - rule: Say hello when user greets
+    steps:
+      - intent: greet
+      - action: utter_greet
+
+  - rule: Respond to thanks
+    steps:
+      - intent: thank
+      - action: utter_thanks_response
+
+  - rule: Provide help
+    steps:
+      - intent: help
+      - action: utter_help
+
+  # ========== DEVICE CONTROL - LIGHTS ==========
+  - rule: Turn on light
+    steps:
+      - intent: turn_on_light
+      - action: action_turn_on_device
+
+  - rule: Turn off light
+    steps:
+      - intent: turn_off_light
+      - action: action_turn_off_device
+
+  - rule: Set brightness
+    steps:
+      - intent: set_brightness
+      - action: action_set_brightness
+
+  # ========== DEVICE CONTROL - FAN ==========
+  - rule: Turn on fan
+    steps:
+      - intent: turn_on_fan
+      - action: action_turn_on_device
+
+  - rule: Turn off fan
+    steps:
+      - intent: turn_off_fan
+      - action: action_turn_off_device
+
+  - rule: Set fan speed
+    steps:
+      - intent: set_fan_speed
+      - action: action_set_fan_speed
+
+  # ========== DEVICE CONTROL - AC ==========
+  - rule: Turn on AC
+    steps:
+      - intent: turn_on_ac
+      - action: action_turn_on_device
+
+  - rule: Turn off AC
+    steps:
+      - intent: turn_off_ac
+      - action: action_turn_off_device
+
+  - rule: Set temperature
+    steps:
+      - intent: set_temperature
+      - action: action_set_temperature
+
+  # ========== ALARMS & REMINDERS ==========
+  - rule: Set alarm
+    steps:
+      - intent: set_alarm
+      - action: action_set_alarm
+
+  - rule: Cancel alarm
+    steps:
+      - intent: cancel_alarm
+      - action: action_cancel_alarm
+
+  - rule: List alarms
+    steps:
+      - intent: list_alarms
+      - action: action_list_alarms
+
+  - rule: Set reminder
+    steps:
+      - intent: set_reminder
+      - action: action_set_reminder
+
+  - rule: Set timer
+    steps:
+      - intent: set_timer
+      - action: action_set_timer
+
+  - rule: Check timer
+    steps:
+      - intent: check_timer
+      - action: action_check_timer
+
+  # ========== LISTS ==========
+  - rule: Add to shopping list
+    steps:
+      - intent: add_to_shopping_list
+      - action: action_add_to_shopping_list
+
+  - rule: Remove from shopping list
+    steps:
+      - intent: remove_from_shopping_list
+      - action: action_remove_from_shopping_list
+
+  - rule: Read shopping list
+    steps:
+      - intent: read_shopping_list
+      - action: action_read_shopping_list
+
+  - rule: Clear shopping list
+    steps:
+      - intent: clear_shopping_list
+      - action: action_clear_shopping_list
+
+  - rule: Add to todo
+    steps:
+      - intent: add_to_todo_list
+      - action: action_add_to_todo
+
+  - rule: Mark todo complete
+    steps:
+      - intent: mark_todo_complete
+      - action: action_mark_todo_complete
+
+  - rule: Read todo list
+    steps:
+      - intent: read_todo_list
+      - action: action_read_todo_list
+
+  # ========== NOTES & MEMORY ==========
+  - rule: Create note
+    steps:
+      - intent: create_note
+      - action: action_create_note
+
+  - rule: Read notes
+    steps:
+      - intent: read_notes
+      - action: action_read_notes
+
+  - rule: Remember preference
+    steps:
+      - intent: set_preference
+      - action: action_remember_preference
+
+  - rule: Recall memory
+    steps:
+      - intent: recall_memory
+      - action: action_recall_memory
+
+  - rule: Forget memory
+    steps:
+      - intent: forget_this
+      - action: action_forget_memory
+
+  # ========== INFORMATION ==========
+  - rule: Get time
+    steps:
+      - intent: ask_time
+      - action: action_get_time
+
+  - rule: Get date
+    steps:
+      - intent: ask_date
+      - action: action_get_date
+
+  - rule: Get weather
+    steps:
+      - intent: ask_weather
+      - action: action_get_weather
+
+  - rule: Get status
+    steps:
+      - intent: ask_status
+      - action: action_get_status
+
+  # ========== CALENDAR ==========
+  - rule: Add calendar event
+    steps:
+      - intent: add_calendar_event
+      - action: action_add_calendar_event
+
+  - rule: Check calendar
+    steps:
+      - intent: check_calendar
+      - action: action_check_calendar
+
+  # ========== FALLBACK ==========
+  - rule: Ask for rephrase if low confidence
+    steps:
+      - intent: nlu_fallback
+      - action: utter_ask_rephrase

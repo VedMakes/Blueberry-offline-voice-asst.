@@ -1,0 +1,52 @@
+language: hi
+
+pipeline:
+  # Tokenization
+- name: WhitespaceTokenizer
+
+- name: DucklingEntityExtractor
+  url: http://127.0.0.1:8000
+  dimensions:
+  - time
+  - duration
+  timezone: "Asia/Kolkata"
+  locale: "hi_IN"
+
+  # Featurization
+- name: RegexFeaturizer
+- name: LexicalSyntacticFeaturizer
+
+  # Word-level bag-of-words
+- name: CountVectorsFeaturizer
+  analyzer: word
+  min_df: 1
+
+  # Character-level n-grams (crucial for Hindi)
+- name: CountVectorsFeaturizer
+  analyzer: char_wb
+  min_ngram: 2
+  max_ngram: 5
+
+  # Intent classifier + entity extractor
+- name: DIETClassifier
+  epochs: 300
+  constrain_similarities: true
+  evaluate_on_num_examples: 0
+  number_of_negative_examples: 20
+  drop_rate: 0.2
+  embedding_dimension: 30
+
+  # Entity synonym mapping
+- name: EntitySynonymMapper
+
+  # Fallback classifier
+- name: FallbackClassifier
+  threshold: 0.5
+
+# Policies for dialogue management
+policies:
+- name: RulePolicy
+  core_fallback_threshold: 0.3
+  core_fallback_action_name: action_default_fallback
+
+assistant_id: 20260217-020858-leather-raft
